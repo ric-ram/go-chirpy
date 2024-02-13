@@ -22,6 +22,7 @@ func main() {
 	const port = "8080"
 
 	mux := http.NewServeMux()
+	mux.Handle("/", http.FileServer(http.Dir(".")))
 	corsMux := middlewareCors(mux)
 
 	server := &http.Server{
@@ -31,9 +32,5 @@ func main() {
 
 	log.Printf("Serving on port: %s\n", port)
 	log.Fatal(server.ListenAndServe())
-	// err := server.ListenAndServe()
-	// if err != nil {
-	// 	fmt.Printf("error listening for server: %s\n", err)
-	// }
 
 }

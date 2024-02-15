@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 func main() {
@@ -13,13 +15,17 @@ func main() {
 		fileserverHits: 0,
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", handleReadiness)
-	mux.Handle("/app/", apiCfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
-	mux.HandleFunc("/metrics", apiCfg.handlerMetrics)
-	mux.HandleFunc("/reset", apiCfg.handlerReset)
+	r := chi.NewRouter()
 
-	corsMux := middlewareCors(mux)
+	fsHandler := apiCfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))))
+
+	r.Handle("/app/*", fsHandler)
+	r.Handle("/app", fsHandler)
+	r.Get("/healthz", handleReadiness)
+	r.Get("/metrics", apiCfg.handlerMetrics)
+	r.HandleFunc("/reset", apiCfg.handlerReset)
+
+	corsMux := middlewareCors(r)
 
 	server := &http.Server{
 		Addr:    ":" + port,

@@ -7,6 +7,8 @@ import (
 	"sync"
 )
 
+var ErrNotExist = errors.New("resource does not exist")
+
 type Chirp struct {
 	ID   int
 	Body string
@@ -125,4 +127,19 @@ func (db *DB) GetChirps() ([]Chirp, error) {
 	}
 
 	return chirps, nil
+}
+
+// GetChirpsById returns the chirp with the correspondent ID
+func (db *DB) GetChirpsById(id int) (Chirp, error) {
+	dbStructure, err := db.loadDB()
+	if err != nil {
+		return Chirp{}, err
+	}
+
+	chirp, ok := dbStructure.Chirps[id]
+	if !ok {
+		return Chirp{}, ErrNotExist
+	}
+
+	return chirp, nil
 }

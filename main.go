@@ -1,8 +1,11 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/ric-ram/go-chirpy/internal/database"
@@ -13,7 +16,18 @@ type apiConfig struct {
 	DB             *database.DB
 }
 
+var debugMode = flag.Bool("debug", false, "Enable debug mode")
+
 func main() {
+	flag.Parse()
+
+	if *debugMode {
+		err := os.Remove("database.json")
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
 	const filepathRoot = "."
 	const port = "8080"
 

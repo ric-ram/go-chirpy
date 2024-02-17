@@ -8,10 +8,12 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
+	"github.com/joho/godotenv"
 	"github.com/ric-ram/go-chirpy/internal/database"
 )
 
 type apiConfig struct {
+	jwtSecret      string
 	fileserverHits int
 	DB             *database.DB
 }
@@ -19,6 +21,13 @@ type apiConfig struct {
 var debugMode = flag.Bool("debug", false, "Enable debug mode")
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	jwtSecret := os.Getenv("JWT_SECRET")
+
 	flag.Parse()
 
 	if *debugMode {
@@ -37,6 +46,7 @@ func main() {
 	}
 
 	apiCfg := apiConfig{
+		jwtSecret:      jwtSecret,
 		fileserverHits: 0,
 		DB:             db,
 	}
@@ -54,6 +64,7 @@ func main() {
 	apiRouter.Post("/chirps", apiCfg.handlerChirpsPost)
 	apiRouter.Post("/users", apiCfg.handlerUsersPost)
 	apiRouter.Post("/login", apiCfg.handlerUserLogin)
+	apiRouter.Put("/users", apiCfg.handlerUserUpdate)
 	router.Mount("/api", apiRouter)
 
 	adminRouter := chi.NewRouter()

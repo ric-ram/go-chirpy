@@ -26,7 +26,7 @@ func (cfg *apiConfig) handlerUsersPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), 14)
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't encrypt password")
 		return

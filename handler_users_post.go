@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"golang.org/x/crypto/bcrypt"
+	"github.com/ric-ram/go-chirpy/internal/auth"
 )
 
 type User struct {
@@ -26,9 +26,9 @@ func (cfg *apiConfig) handlerUsersPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
+	encryptedPassword, err := auth.HashPassword(params.Password)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't encrypt password")
+		respondWithError(w, http.StatusInternalServerError, "Invalid password")
 		return
 	}
 

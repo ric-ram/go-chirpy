@@ -10,12 +10,12 @@ type User struct {
 	Password string
 }
 
-var ErrAlreadyExists = errors.New("already exists")
+var ErrUserAlreadyExists = errors.New("user already exists")
 
 // CreateUser creates a new user and saves it to disk
 func (db *DB) CreateUSer(email, password string) (User, error) {
 	if _, err := db.GetUserByEmail(email); !errors.Is(err, ErrNotExist) {
-		return User{}, ErrAlreadyExists
+		return User{}, ErrUserAlreadyExists
 	}
 
 	dbStructure, err := db.loadDB()

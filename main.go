@@ -64,6 +64,8 @@ func main() {
 	apiRouter.Post("/chirps", apiCfg.handlerChirpsPost)
 	apiRouter.Post("/users", apiCfg.handlerUsersPost)
 	apiRouter.Post("/login", apiCfg.handlerUserLogin)
+	apiRouter.Post("/refresh", apiCfg.handlerTokenRefresh)
+	apiRouter.Post("/revoke", apiCfg.handlerTokenRevoke)
 	apiRouter.Put("/users", apiCfg.handlerUserUpdate)
 	router.Mount("/api", apiRouter)
 

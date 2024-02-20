@@ -3,15 +3,15 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/ric-ram/go-chirpy/internal/auth"
 )
 
 type AuthenticatedUser struct {
-	ID    int    `json:"id"`
-	Email string `json:"email"`
-	Token string `json:"token"`
+	ID           int    `json:"id"`
+	Email        string `json:"email"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
@@ -48,15 +48,22 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		params.ExpiresInSeconds = defaultExpiration
 	}
 
-	jwtToken, err := auth.CreateJwtToken(existingUser.ID, cfg.jwtSecret, time.Duration(params.ExpiresInSeconds)*time.Second)
+	accessJwtToken, err := auth.CreateJwtToken(existingUser.ID, cfg.jwtSecret, "access")
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't create JWT")
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create Access JWT")
+		return
+	}
+
+	refreshJwtToken, err := auth.CreateJwtToken(existingUser.ID, cfg.jwtSecret, "refresh")
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create Refresh JWT")
 		return
 	}
 
 	respondWithJSON(w, http.StatusOK, AuthenticatedUser{
-		ID:    existingUser.ID,
-		Email: existingUser.Email,
-		Token: jwtToken,
+		ID:           existingUser.ID,
+		Email:        existingUser.Email,
+		Token:        accessJwtToken,
+		RefreshToken: refreshJwtToken,
 	})
 }

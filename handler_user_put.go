@@ -24,15 +24,21 @@ func (cfg *apiConfig) handlerUserUpdate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	userIDString, err := auth.ValidateJwtToken(headerToken, cfg.jwtSecret)
+	validToken, err := auth.ValidateAccessJwtToken(headerToken, cfg.jwtSecret)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "Couldn't validate JWT")
 		return
 	}
 
+	userIDString, err := auth.GetUserID(validToken)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Error getting id from token")
+	}
+
 	userID, err := strconv.Atoi(userIDString)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Error parsing id")
+		return
 	}
 
 	decoder := json.NewDecoder(r.Body)

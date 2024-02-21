@@ -56,21 +56,29 @@ func main() {
 	router.Handle("/app", fsHandler)
 	router.Handle("/app/*", fsHandler)
 
+	// /api route
 	apiRouter := chi.NewRouter()
 	apiRouter.Get("/healthz", handleReadiness)
 	apiRouter.Get("/reset", apiCfg.handlerReset)
 	apiRouter.Get("/chirps", apiCfg.handlerChirpsGet)
-	apiRouter.Get("/chirps/{id}", apiCfg.handlerChirpsGetById)
+	apiRouter.Get("/chirps/{chirpID}", apiCfg.handlerChirpsGetById)
+
 	apiRouter.Post("/chirps", apiCfg.handlerChirpsPost)
 	apiRouter.Post("/users", apiCfg.handlerUsersPost)
 	apiRouter.Post("/login", apiCfg.handlerUserLogin)
 	apiRouter.Post("/refresh", apiCfg.handlerTokenRefresh)
 	apiRouter.Post("/revoke", apiCfg.handlerTokenRevoke)
+
 	apiRouter.Put("/users", apiCfg.handlerUserUpdate)
+
+	apiRouter.Delete("/chirps/{chirpID}", apiCfg.handlerChirpDelete)
+
 	router.Mount("/api", apiRouter)
 
+	// /admin route
 	adminRouter := chi.NewRouter()
 	adminRouter.Get("/metrics", apiCfg.handlerMetrics)
+
 	router.Mount("/admin", adminRouter)
 
 	corsMux := middlewareCors(router)

@@ -87,3 +87,10 @@ func (db *DB) loadDB() (DBStructure, error) {
 
 	return dbStructure, nil
 }
+
+// DeleteFromDB deletes a resource from the database
+func (db *DB) DeleteFromDB() {
+	db.mux.Lock()
+	defer db.mux.Unlock()
+
+}

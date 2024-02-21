@@ -18,8 +18,9 @@ func (cfg *apiConfig) handlerChirpsGet(w http.ResponseWriter, r *http.Request) {
 	chirps := []Chirp{}
 	for _, chirp := range dbChirps {
 		chirps = append(chirps, Chirp{
-			ID:   chirp.ID,
-			Body: chirp.Body,
+			ID:       chirp.ID,
+			Body:     chirp.Body,
+			AuthorID: chirp.AuthorID,
 		})
 	}
 
@@ -32,7 +33,7 @@ func (cfg *apiConfig) handlerChirpsGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *apiConfig) handlerChirpsGetById(w http.ResponseWriter, r *http.Request) {
-	paramID := chi.URLParam(r, "id")
+	paramID := chi.URLParam(r, "chirpID")
 	id, err := strconv.Atoi(paramID)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid chirp ID")
@@ -46,7 +47,8 @@ func (cfg *apiConfig) handlerChirpsGetById(w http.ResponseWriter, r *http.Reques
 	}
 
 	respondWithJSON(w, http.StatusOK, Chirp{
-		ID:   chirp.ID,
-		Body: chirp.Body,
+		ID:       chirp.ID,
+		Body:     chirp.Body,
+		AuthorID: chirp.AuthorID,
 	})
 }

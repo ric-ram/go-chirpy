@@ -8,8 +8,9 @@ import (
 )
 
 type User struct {
-	ID    int    `json:"id"`
-	Email string `json:"email"`
+	ID          int    `json:"id"`
+	Email       string `json:"email"`
+	IsChirpyRed bool   `json:"is_chirpy_red"`
 }
 
 func (cfg *apiConfig) handlerUsersPost(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +40,8 @@ func (cfg *apiConfig) handlerUsersPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusCreated, User{
-		ID:    user.ID,
-		Email: params.Email,
+		ID:          user.ID,
+		Email:       params.Email,
+		IsChirpyRed: user.IsChirpRed,
 	})
 }

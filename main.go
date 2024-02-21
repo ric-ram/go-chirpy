@@ -14,6 +14,7 @@ import (
 
 type apiConfig struct {
 	jwtSecret      string
+	polkaApiSecret string
 	fileserverHits int
 	DB             *database.DB
 }
@@ -27,6 +28,7 @@ func main() {
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
+	polkaApiSecret := os.Getenv("POLKA_API_KEY")
 
 	flag.Parse()
 
@@ -47,6 +49,7 @@ func main() {
 
 	apiCfg := apiConfig{
 		jwtSecret:      jwtSecret,
+		polkaApiSecret: polkaApiSecret,
 		fileserverHits: 0,
 		DB:             db,
 	}
@@ -68,6 +71,7 @@ func main() {
 	apiRouter.Post("/login", apiCfg.handlerUserLogin)
 	apiRouter.Post("/refresh", apiCfg.handlerTokenRefresh)
 	apiRouter.Post("/revoke", apiCfg.handlerTokenRevoke)
+	apiRouter.Post("/polka/webhooks", apiCfg.handlerChirpyRed)
 
 	apiRouter.Put("/users", apiCfg.handlerUserUpdate)
 

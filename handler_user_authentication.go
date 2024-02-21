@@ -10,15 +10,15 @@ import (
 type AuthenticatedUser struct {
 	ID           int    `json:"id"`
 	Email        string `json:"email"`
+	IsChirpyRed  bool   `json:"is_chirpy_red"`
 	Token        string `json:"token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
 func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Email            string `json:"email"`
-		Password         string `json:"password"`
-		ExpiresInSeconds int    `json:"expires_in_seconds"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -41,13 +41,6 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defaultExpiration := 60 * 60 * 24
-	if params.ExpiresInSeconds == 0 {
-		params.ExpiresInSeconds = defaultExpiration
-	} else if params.ExpiresInSeconds > defaultExpiration {
-		params.ExpiresInSeconds = defaultExpiration
-	}
-
 	accessJwtToken, err := auth.CreateJwtToken(existingUser.ID, cfg.jwtSecret, "access")
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create Access JWT")
@@ -63,6 +56,7 @@ func (cfg *apiConfig) handlerUserLogin(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, AuthenticatedUser{
 		ID:           existingUser.ID,
 		Email:        existingUser.Email,
+		IsChirpyRed:  existingUser.IsChirpRed,
 		Token:        accessJwtToken,
 		RefreshToken: refreshJwtToken,
 	})

@@ -1,6 +1,8 @@
 package database
 
-import "errors"
+import (
+	"errors"
+)
 
 var ErrNotExist = errors.New("resource does not exist")
 
@@ -18,9 +20,6 @@ func (db *DB) CreateChirp(body string, authorID int) (Chirp, error) {
 	}
 
 	lenChirps := len(dbStructure.Chirps)
-	if lenChirps == 0 {
-		lenChirps = 1
-	}
 	ID := dbStructure.Chirps[lenChirps-1].ID + 1
 	chirp := Chirp{
 		ID:       ID,
@@ -28,7 +27,7 @@ func (db *DB) CreateChirp(body string, authorID int) (Chirp, error) {
 		AuthorID: authorID,
 	}
 
-	dbStructure.Chirps[ID] = chirp
+	dbStructure.Chirps[lenChirps] = chirp
 
 	err = db.writeDB(dbStructure)
 	if err != nil {
@@ -66,6 +65,23 @@ func (db *DB) GetChirpsById(id int) (Chirp, error) {
 	}
 
 	return chirp, nil
+}
+
+// GetChirpsByAuthorId returns the chirp with the correspondent AuthorID
+func (db *DB) GetChirpsByAuthorId(authorID int) ([]Chirp, error) {
+	dbStructure, err := db.loadDB()
+	if err != nil {
+		return []Chirp{}, err
+	}
+
+	chirps := make([]Chirp, 0, len(dbStructure.Chirps))
+	for _, chirp := range dbStructure.Chirps {
+		if chirp.AuthorID == authorID {
+			chirps = append(chirps, chirp)
+		}
+	}
+
+	return chirps, nil
 }
 
 // DeleteChirp deletes the chirp
